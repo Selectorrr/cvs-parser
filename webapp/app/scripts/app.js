@@ -10,13 +10,8 @@
  */
 angular
   .module('appApp', [
-    'ngAnimate',
-    'ngCookies',
-    'ngResource',
     'ngRoute',
-    'ngSanitize',
-    'ngTouch',
-    'angles'
+    "highcharts-ng"
   ])
   .config(function ($routeProvider) {
     $routeProvider

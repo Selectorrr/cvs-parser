@@ -1,44 +1,26 @@
-<div class="row">
-  <div class="col-xs-offset-1 col-xs-5 text-center">
-    температура
-  </div>
-  <div class="col-xs-5 text-center">
-    влажность
-  </div>
-</div>
-<div class="row text-center">{{name1}}</div>
-<div class="row">
-  <div class="col-xs-offset-1 col-xs-5 text-center">
-    <canvas linechart options="options" data="chart1"></canvas>
-  </div>
-  <div class="col-xs-5 text-center">
-    <canvas linechart options="options" data="chart2"></canvas>
+<div ng-repeat="chart in charts">
+  <div class="row">
+
+    <div class="col-xs-12">
+      <highchart config="charts[$index]"></highchart>
+    </div>
   </div>
 </div>
-<div class="row text-center">{{name2}}</div>
-<div class="row">
-  <div class="col-xs-offset-1 col-xs-5">
-    <canvas linechart options="options" data="chart3"></canvas>
-  </div>
-  <div class="col-xs-5">
-    <canvas linechart options="options" data="chart4"></canvas>
-  </div>
-</div>
-<div class="row text-center">{{name3}}</div>
-<div class="row">
-  <div class="col-xs-offset-1 col-xs-5">
-    <canvas linechart options="options" data="chart5"></canvas>
-  </div>
-  <div class="col-xs-5">
-    <canvas linechart options="options" data="chart6"></canvas>
-  </div>
-</div>
-<div class="row text-center">{{name4}}</div>
-<div class="row">
-  <div class="col-xs-offset-1 col-xs-5">
-    <canvas linechart options="options" data="chart7"></canvas>
-  </div>
-  <div class="col-xs-5">
-    <canvas linechart options="options" data="chart8"></canvas>
-  </div>
-</div>
+
+<!--<highchart config="getData(chart,'wetness')"></highchart>-->
+<!--<div class="row">-->
+<!--<div class="col-xs-12 text-center">-->
+<!--{{chart.name}}-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="row">-->
+<!--<div class="col-xs-12">-->
+<!--<canvas linechart options="options" data="getData(chart,'temperature')"></canvas>-->
+<!--</div>-->
+<!--</div>-->
+<!--<div class="row">-->
+<!--<div class="col-xs-12">-->
+<!--<canvas linechart options="options" data="getData(chart,'wetness')"></canvas>-->
+<!--</div>-->
+<!--</div>-->
+<!--</div>-->

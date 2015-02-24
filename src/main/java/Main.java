@@ -1,17 +1,17 @@
 import com.google.common.base.Function;
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.*;
 import com.google.gson.Gson;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        Reader in = new FileReader(args[0]);
+        Reader in = new FileReader("C:\\Users\\Selector\\Desktop\\data2.csv");
         Iterable<CSVRecord> records = CSVFormat.newFormat(',').parse(in);
         Gson gson = new Gson();
 
@@ -29,49 +29,57 @@ public class Main {
             data.put(record.get(0), record);
         }
         String result = "";
-        int i = 1;
+        List<Chart> charts = Lists.newArrayList();
         for (String key : data.keySet()) {
             Collection<CSVRecord> csvRecords = data.get(key);
-            List<String> x = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, String>() {
+            List<List<Long>> temperature = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Long>>() {
                 @Override
-                public String apply(CSVRecord strings) {
-                    return strings.get(3);
+                public List<Long> apply(CSVRecord strings) {
+                    return ImmutableList.of(getDate(strings), Long.valueOf(strings.get(1)));
                 }
             }));
-            List<String> one = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, String>() {
+            charts.add(new Chart(key, "Температура", temperature));
+            List<List<Long>> wetness = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Long>>() {
                 @Override
-                public String apply(CSVRecord strings) {
-                    return strings.get(1);
+                public List<Long> apply(CSVRecord strings) {
+                    return ImmutableList.of(getDate(strings), Long.valueOf(strings.get(2)));
                 }
             }));
-            List<String> two = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, String>() {
-                @Override
-                public String apply(CSVRecord strings) {
-                    return strings.get(2);
-                }
-            }));
-            Chart chart = new Chart(key, one, two, x);
-            gson.toJson(chart);
-            result = result + "window.chart" + i + " = \r\n" + gson.toJson(chart) + ";\r\n";
-            i = i + 1;
+            charts.add(new Chart(key, "Влажность", wetness));
         }
+        result = result + "window.charts = " + gson.toJson(charts) + ";\r\n";
         File file = new File("data.js");
+//        result = result.replace("\"", "");
         FileUtils.writeStringToFile(file, result);
         System.out.println("file created: " + file.getAbsolutePath());
+    }
+
+    private static long getDate(CSVRecord strings) {
+        DateTimeZone.setDefault(DateTimeZone.UTC);
+        DateTime now = new DateTime();
+        LocalTime time = LocalTime.parse(strings.get(3));
+        DateTime dateTime = now.withMillisOfDay(0).plusSeconds(time.toSecondOfDay());
+        String result = String.format("Date.UTC(%s, %s, %s, %s, %s)",
+                now.year().get(),
+                now.monthOfYear().get() - 1,
+                now.dayOfMonth().get(),
+                time.getHour(),
+                time.getMinute()
+        );
+
+        return dateTime.getMillis();
     }
 
 
     private static class Chart {
         public String name;
-        public List<String> temperature;
-        public List<String> wetness;
-        public List<String> dateTime;
+        public String yLabel;
+        public List<List<Long>> data;
 
-        public Chart(String name, List<String> temperature, List<String> wetness, List<String> dateTime) {
+        public Chart(String name, String yLabel, List<List<Long>> data) {
             this.name = name;
-            this.temperature = temperature;
-            this.wetness = wetness;
-            this.dateTime = dateTime;
+            this.yLabel = yLabel;
+            this.data = data;
         }
     }
 }
