@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class Main {
     public static void main(String[] args) throws IOException {
-        Reader in = new FileReader("C:\\Users\\Selector\\Desktop\\data2.csv");
+        Reader in = new FileReader(args[0]);
         Iterable<CSVRecord> records = CSVFormat.newFormat(',').parse(in);
         Gson gson = new Gson();
 
