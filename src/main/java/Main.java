@@ -35,14 +35,14 @@ public class Main {
             List<List<Long>> temperature = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Long>>() {
                 @Override
                 public List<Long> apply(CSVRecord strings) {
-                    return ImmutableList.of(getDate(strings), Long.valueOf(strings.get(1)));
+                    return ImmutableList.of(Long.valueOf(strings.get(3)), Long.valueOf(strings.get(1)));
                 }
             }));
             charts.add(new Chart(key, "Температура", temperature));
             List<List<Long>> wetness = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Long>>() {
                 @Override
                 public List<Long> apply(CSVRecord strings) {
-                    return ImmutableList.of(getDate(strings), Long.valueOf(strings.get(2)));
+                    return ImmutableList.of(Long.valueOf(strings.get(3)), Long.valueOf(strings.get(2)));
                 }
             }));
             charts.add(new Chart(key, "Влажность", wetness));
@@ -53,23 +53,6 @@ public class Main {
         FileUtils.writeStringToFile(file, result);
         System.out.println("file created: " + file.getAbsolutePath());
     }
-
-    private static long getDate(CSVRecord strings) {
-        DateTimeZone.setDefault(DateTimeZone.UTC);
-        DateTime now = new DateTime();
-        LocalTime time = LocalTime.parse(strings.get(3));
-        DateTime dateTime = now.withMillisOfDay(0).plusSeconds(time.toSecondOfDay());
-        String result = String.format("Date.UTC(%s, %s, %s, %s, %s)",
-                now.year().get(),
-                now.monthOfYear().get() - 1,
-                now.dayOfMonth().get(),
-                time.getHour(),
-                time.getMinute()
-        );
-
-        return dateTime.getMillis();
-    }
-
 
     private static class Chart {
         public String name;
