@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -27,7 +28,13 @@ public class Main {
         }
         String result = "";
         List<Chart> charts = Lists.newArrayList();
-        for (String key : data.keySet()) {
+        ImmutableSortedSet<String> sortedKeys = ImmutableSortedSet.copyOf(new Comparator<String>() {
+            @Override
+            public int compare(String o1, String o2) {
+                return Ordering.natural().compare(o1, o2);
+            }
+        }, data.keySet());
+        for (String key : sortedKeys) {
             Collection<CSVRecord> csvRecords = data.get(key);
             List<List<Number>> temperature = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Number>>() {
                 @Override
