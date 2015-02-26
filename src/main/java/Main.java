@@ -4,14 +4,11 @@ import com.google.gson.Gson;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FileUtils;
-import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -32,17 +29,17 @@ public class Main {
         List<Chart> charts = Lists.newArrayList();
         for (String key : data.keySet()) {
             Collection<CSVRecord> csvRecords = data.get(key);
-            List<List<Long>> temperature = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Long>>() {
+            List<List<Number>> temperature = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Number>>() {
                 @Override
-                public List<Long> apply(CSVRecord strings) {
-                    return ImmutableList.of(Long.valueOf(strings.get(3)), Long.valueOf(strings.get(1)));
+                public List<Number> apply(CSVRecord strings) {
+                    return ImmutableList.<Number>of(Long.valueOf(strings.get(3)), Double.valueOf(strings.get(1)));
                 }
             }));
             charts.add(new Chart(key, "Температура", temperature));
-            List<List<Long>> wetness = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Long>>() {
+            List<List<Number>> wetness = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Number>>() {
                 @Override
-                public List<Long> apply(CSVRecord strings) {
-                    return ImmutableList.of(Long.valueOf(strings.get(3)), Long.valueOf(strings.get(2)));
+                public List<Number> apply(CSVRecord strings) {
+                    return ImmutableList.<Number>of(Long.valueOf(strings.get(3)), Double.valueOf(strings.get(2)));
                 }
             }));
             charts.add(new Chart(key, "Влажность", wetness));
@@ -57,9 +54,9 @@ public class Main {
     private static class Chart {
         public String name;
         public String yLabel;
-        public List<List<Long>> data;
+        public List<List<Number>> data;
 
-        public Chart(String name, String yLabel, List<List<Long>> data) {
+        public Chart(String name, String yLabel, List<List<Number>> data) {
             this.name = name;
             this.yLabel = yLabel;
             this.data = data;
