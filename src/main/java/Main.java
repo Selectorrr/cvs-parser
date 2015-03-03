@@ -36,20 +36,25 @@ public class Main {
         }, data.keySet());
         for (String key : sortedKeys) {
             Collection<CSVRecord> csvRecords = data.get(key);
-            List<List<Number>> temperature = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Number>>() {
+            List<Double> temperature = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, Double>() {
                 @Override
-                public List<Number> apply(CSVRecord strings) {
-                    return ImmutableList.<Number>of(Long.valueOf(strings.get(3)), Double.valueOf(strings.get(1)));
+                public Double apply(CSVRecord strings) {
+                    return Double.valueOf(strings.get(1));
                 }
             }));
-            charts.add(new Chart(key, "Температура", temperature));
-            List<List<Number>> wetness = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, List<Number>>() {
+            List<Double> wetness = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, Double>() {
                 @Override
-                public List<Number> apply(CSVRecord strings) {
-                    return ImmutableList.<Number>of(Long.valueOf(strings.get(3)), Double.valueOf(strings.get(2)));
+                public Double apply(CSVRecord strings) {
+                    return Double.valueOf(strings.get(2));
                 }
             }));
-            charts.add(new Chart(key, "Влажность", wetness));
+            List<Long> time = Lists.newArrayList(Iterables.transform(csvRecords, new Function<CSVRecord, Long>() {
+                @Override
+                public Long apply(CSVRecord strings) {
+                    return Long.valueOf(strings.get(3)) + 21600 * 1000;
+                }
+            }));
+            charts.add(new Chart(key, temperature, wetness, time));
         }
         result = result + "window.charts = " + gson.toJson(charts) + ";\r\n";
         File file = new File("data.js");
@@ -60,13 +65,17 @@ public class Main {
 
     private static class Chart {
         public String name;
-        public String yLabel;
-        public List<List<Number>> data;
+        public List<List<Number>> temperature;
+        public List<List<Number>> wetness;
 
-        public Chart(String name, String yLabel, List<List<Number>> data) {
+        public Chart(String name, List<Double> temperature, List<Double> wetness, List<Long> time) {
             this.name = name;
-            this.yLabel = yLabel;
-            this.data = data;
+            this.temperature = Lists.newArrayList();
+            this.wetness = Lists.newArrayList();
+            for (int i = 0; i < time.size(); i++) {
+                this.temperature.add(ImmutableList.<Number>of(time.get(i), temperature.get(i)));
+                this.wetness.add(ImmutableList.<Number>of(time.get(i), wetness.get(i)));
+            }
         }
     }
 }
